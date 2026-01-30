@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MyStoryTeller.io - Magical Stories for Kids</title>
+    <style>
+        body { font-family: 'Comic Sans MS', sans-serif; text-align: center; background: #f0f8ff; padding: 50px; }
+        .login-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: inline-block; }
+        .btn { display: block; width: 200px; padding: 10px; margin: 10px auto; border-radius: 5px; text-decoration: none; color: white; font-weight: bold; }
+        .google { background: #db4437; }
+        .github { background: #333; }
+        .facebook { background: #4267B2; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h1>Welcome to MyStoryTeller.io</h1>
+        <p>Login to create a special story for your child!</p>
+        
+        <a href="https://your-ec2-api.com/oauth2/authorization/google" class="btn google">Login with Google</a>
+        <a href="https://your-ec2-api.com/oauth2/authorization/github" class="btn github">Login with GitHub</a>
+        <a href="https://your-ec2-api.com/oauth2/authorization/facebook" class="btn facebook">Login with Facebook</a>
+    </div>
+
+    <script>
+        // Check if there is a token in the URL after redirect
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (token) {
+            localStorage.setItem('jwt_token', token);
+            // Optional: Fetch user info from your backend using the token here
+            console.log("Authentication Successful!");
+            
+            // Clean the URL so the token isn't visible
+            window.history.replaceState({}, document.title, "/");
+            
+            alert("Welcome back! Ready to tell a story?");
+        }
+    </script>
+</body>
+</html>
