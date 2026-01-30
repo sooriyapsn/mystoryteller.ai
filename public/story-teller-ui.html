@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStoryTeller.io - Magical Stories</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --primary: #70A1FF; 
+            --secondary: #FF7F50; 
+            --accent: #7BED9F; 
+            --bg: #F0F9FF; 
+            --text: #2F3542;
+        }
+        
+        body { 
+            font-family: 'Fredoka', sans-serif; 
+            background: var(--bg);
+            /* Soft Cloud Background Pattern */
+            background-image: radial-gradient(#ffffff 20%, transparent 20%), radial-gradient(#ffffff 20%, transparent 20%);
+            background-position: 0 0, 50px 50px;
+            background-size: 100px 100px;
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes wobble {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .hero { 
+            text-align: center; 
+            padding: 50px 20px; 
+            background: white; 
+            border-radius: 0 0 80px 80px; 
+            box-shadow: 0 15px 40px rgba(112, 161, 255, 0.15); 
+            width: 100%;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        h1 { font-size: 3.5rem; color: var(--primary); margin: 0; filter: drop-shadow(2px 4px 0px #fff); }
+        p { font-size: 1.4rem; color: #747D8C; margin-top: 5px; }
+
+        /* Story Chat Area */
+        .chat-box { 
+            width: 90%; 
+            max-width: 650px; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 40px; 
+            margin: 40px 0; 
+            border: 8px solid #E1F5FE;
+            box-shadow: 0 20px 0px rgba(112, 161, 255, 0.1);
+        }
+
+        .input-group { display: flex; gap: 10px; }
+        input[type="text"] { 
+            flex-grow: 1; 
+            padding: 20px; 
+            border-radius: 30px; 
+            border: 3px solid #F1F2F6; 
+            outline: none; 
+            font-size: 1.1rem; 
+            font-family: inherit;
+            transition: border 0.3s;
+        }
+        input[type="text"]:focus { border-color: var(--primary); }
+
+        button.send { 
+            padding: 0 30px; 
+            background: var(--accent); 
+            color: white; 
+            border: none; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-size: 1.2rem;
+            font-family: inherit;
+            box-shadow: 0 5px 0px #2ED573;
+            transition: all 0.2s;
+        }
+        button.send:active { transform: translateY(3px); box-shadow: 0 2px 0px #2ED573; }
+
+        /* MAGIC MARQUEE */
+        .marquee-container { 
+            width: 100%; 
+            overflow: hidden; 
+            background: #fff; 
+            padding: 30px 0; 
+            border-top: 8px dashed var(--bg);
+            margin-top: auto; 
+        }
+        .marquee-inner { display: flex; width: max-content; animation: scroll 60s linear infinite; }
+        .character-card { 
+            flex: 0 0 auto; 
+            width: 140px; 
+            text-align: center; 
+            margin: 0 25px; 
+            transition: transform 0.3s;
+        }
+        .character-card:hover { animation: wobble 0.5s ease-in-out infinite; }
+        .character-card img { 
+            width: 150px; 
+            height: 150px; 
+            border-radius: 30px; 
+            background: var(--bg);
+            padding: 5px;
+            object-fit: contain;
+            border: 4px solid #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+        .character-card p { font-size: 1rem; color: var(--primary); font-weight: 600; text-transform: capitalize; }
+        
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        #responseArea { 
+            margin-top: 25px; 
+            font-size: 1.3rem; 
+            line-height: 1.8; 
+            color: #57606F; 
+            padding: 20px;
+            border-radius: 20px;
+            background: #F9FEFF;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <h1>✨ MyStoryTeller ✨</h1>
+    <p>Magical adventures created just for you!</p>
+    
+</div>
+
+<div class="chat-box">
+    <div class="input-group">
+        <input id="promptInput" placeholder="Once upon a time, there was a..." type="text">
+        <button class="send" onclick="sendPrompt()">Start Magic!</button>
+    </div>
+    <div id="responseArea"></div>
+</div>
+
+<div class="marquee-container">
+    <div class="marquee-inner" id="characterList">
+        </div>
+</div>
+
+<script>
+    const characters = [
+        "dragon.png", "fairy.png", "kitten.png", "puppy.png", 
+        "small-cute-dragon.png", "astronaut.png", "robot.png", 
+       "superhero.png", "pirate.png", "unicorn.png", "two-puppies.png"
+    ];
+
+    function initMarquee() {
+        const list = document.getElementById('characterList');
+        const shuffled = [...characters].sort(() => 0.5 - Math.random());
+        const fullList = [...shuffled, ...shuffled, ...shuffled]; // Triple for smoother loop
+        
+        fullList.forEach(file => {
+            const name = file.split('.')[0].replace(/-/g, ' ');
+            const div = document.createElement('div');
+            div.className = 'character-card';
+            div.innerHTML = `<img src="images/fav-characters/${file}" alt="${name}"><p>${name}</p>`;
+            list.appendChild(div);
+        });
+    }
+
+    function sendPrompt() {
+        const token = localStorage.getItem('jwt_token');
+        if (!token) {
+            alert("Ask a grown-up to log in so we can save your stories! ✨");
+            return;
+        }
+
+        const prompt = document.getElementById('promptInput').value;
+        const responseArea = document.getElementById('responseArea');
+        responseArea.innerHTML = '<span style="color:var(--primary)">🪄 Preparing the magic dust...</span>';
+
+        const eventSource = new EventSource(`https://your-ec2-api.com/story?prompt=${encodeURIComponent(prompt)}&token=${token}`);
+
+        eventSource.onmessage = (event) => {
+            if (responseArea.innerText.includes('Preparing')) responseArea.innerHTML = '';
+            responseArea.innerHTML += event.data + " ";
+            // Auto-scroll as story grows
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        };
+
+        eventSource.onerror = () => eventSource.close();
+    }
+
+    window.onload = initMarquee;
+</script>
+</body>
+</html>
